@@ -33,3 +33,17 @@ pd.options.mode.chained_assignment = None  # default='warn'
 
 words = re.compile(r"\w+",re.I)
 stopword = stopwords.words('english')
+
+
+#prelim data exploration
+train = pd.read_csv("train.csv").fillna("")
+test = pd.read_csv("test.csv").fillna("")
+train.groupby("is_duplicate")['id'].count().plot.bar()
+dfs = train[0:2500]
+dfs.groupby("is_duplicate")['id'].count().plot.bar()
+
+dfq1, dfq2 = dfs[['qid1', 'question1']], dfs[['qid2', 'question2']]
+dfq1.columns = ['qid1', 'question']
+dfq2.columns = ['qid2', 'question']
+dfqa = pd.concat((dfq1, dfq2), axis=0).fillna("")
+nrows_for_q1 = dfqa.shape[0]/2
