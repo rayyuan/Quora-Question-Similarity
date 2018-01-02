@@ -47,3 +47,81 @@ dfq1.columns = ['qid1', 'question']
 dfq2.columns = ['qid2', 'question']
 dfqa = pd.concat((dfq1, dfq2), axis=0).fillna("")
 nrows_for_q1 = dfqa.shape[0]/2
+
+all_ques_df = pd.DataFrame(pd.concat([train['question1'], train['question2']]))
+all_ques_df.columns = ["questions"]
+all_ques_df["num_of_words"] = all_ques_df["questions"].apply(lambda x : len(str(x).split()))
+
+cnt_srs = all_ques_df['num_of_words'].value_counts()
+
+plt.figure(figsize=(12,6))
+sns.barplot(cnt_srs.index, cnt_srs.values, alpha=0.8, color=color[0])
+plt.ylabel('Number of Occurrences', fontsize=12)
+plt.xlabel('Number of words in the question', fontsize=12)
+plt.xticks(rotation='vertical')
+plt.show()
+
+all_ques_df["num_of_chars"] = all_ques_df["questions"].apply(lambda x : len(str(x)))
+cnt_srs = all_ques_df['num_of_chars'].value_counts()
+
+plt.figure(figsize=(50,8))
+sns.barplot(cnt_srs.index, cnt_srs.values, alpha=0.8, color=color[3])
+plt.ylabel('Number of Occurrences', fontsize=12)
+plt.xlabel('Number of characters in the question', fontsize=12)
+plt.xticks(rotation='vertical')
+plt.show()
+
+del all_ques_df
+
+train_qs = pd.Series(train['question1'].tolist() + train['question2'].tolist()).astype(str)
+test_qs = pd.Series(test['question1'].tolist() + test['question2'].tolist()).astype(str)
+
+dist_train = train_qs.apply(len)
+dist_test = test_qs.apply(len)
+plt.figure(figsize=(15, 10))
+plt.hist(dist_train, bins=200, range=[0, 200], color=pal[2], normed=True, label='train')
+plt.hist(dist_test, bins=200, range=[0, 200], color=pal[1], normed=True, alpha=0.5, label='test')
+plt.title('Normalised histogram of character count in questions', fontsize=15)
+plt.legend()
+plt.xlabel('Number of characters', fontsize=15)
+plt.ylabel('Probability', fontsize=15)
+
+print('mean-train {:.2f} std-train {:.2f} mean-test {:.2f} std-test {:.2f} max-train {:.2f} max-test {:.2f}'.format(dist_train.mean(),
+                          dist_train.std(), dist_test.mean(), dist_test.std(), dist_train.max(), dist_test.max()))
+##########################################
+#transform questions with Tf-Tfidf
+mq1 = TfidfVectorizer().fit_transform(dfqa['question'].values)
+diff_encodings = mq1[::2] - mq1[1::2]
+
+import nltk
+STOP_WORDS = nltk.corpus.stopwords.words()
+
+def clean_sentence(val):
+    regex = re.compile('([^\s\w]|_&*)+')
+    sentence = regex.sub('', val).lower()
+    sentence = sentence.split(" ")
+
+    for word in list(sentence):
+        if word in STOP_WORDS:
+            sentence.remove(word)  
+
+    sentence = " ".join(sentence)
+    return sentence
+def clean_trainframe(df):
+    df = df.dropna(how="any")
+
+    for col in ['question1', 'question2']:
+        df[col] = df[col].apply(clean_sentence)
+
+    return df
+def build_corpus(df):
+    corpus = []
+    for col in ['question1', 'question2']:
+        for sentence in df[col].iteritems():
+            word_list = sentence[1].split(" ")
+            corpus.append(word_list)
+
+    return corpus
+
+df = clean_trainframe(train)
+corpus = build_corpus(df)
