@@ -103,7 +103,7 @@ def clean_sentence(val):
 
     for word in list(sentence):
         if word in STOP_WORDS:
-            sentence.remove(word)  
+            sentence.remove(word)
 
     sentence = " ".join(sentence)
     return sentence
@@ -125,3 +125,21 @@ def build_corpus(df):
 
 df = clean_trainframe(train)
 corpus = build_corpus(df)
+
+from gensim.models import word2vec
+model = word2vec.Word2Vec(corpus, size=100, window=20, min_count=200, workers=4)
+
+def tsne_plot(model):
+    labels = []
+    tokens = []
+
+    for word in model.wv.vocab:
+        tokens.append(model[word])
+        labels.append(word)
+    tsne_model = TSNE(perplexity=40, n_components=2, init='pca', n_iter=2500, random_state=23)
+    new_values = tsne_model.fit_transform(tokens)
+    x = []
+    y = []
+    for value in new_values:
+        x.append(value[0])
+        y.append(value[1])
