@@ -143,3 +143,15 @@ def tsne_plot(model):
     for value in new_values:
         x.append(value[0])
         y.append(value[1])
+    plt.figure(figsize=(16, 16))
+    for i in range(len(x)):
+        plt.scatter(x[i],y[i])
+        plt.annotate(labels[i],
+                     xy=(x[i], y[i]),
+                     xytext=(5, 2),
+                     textcoords='offset points',
+                     ha='right',
+                     va='bottom')
+    plt.show()
+
+tsne_plot(model)
