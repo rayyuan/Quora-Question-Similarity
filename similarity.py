@@ -208,7 +208,7 @@ def tokenize_questions(df):
     df["Question_2_tok"] = question_2_tokenized
 
     return df
-    
+
 def train_dictionary(df):
 
     questions_tokenized = df.Question_1_tok.tolist() + df.Question_2_tok.tolist()
@@ -222,3 +222,16 @@ def train_dictionary(df):
 df_train = tokenize_questions(train)
 dictionary = train_dictionary(df_train)
 print ("No of words in the dictionary = %s" %len(dictionary.token2id))
+
+def get_vectors(df, dictionary):
+
+    question1_vec = [dictionary.doc2bow(text) for text in df.Question_1_tok.tolist()]
+    question2_vec = [dictionary.doc2bow(text) for text in df.Question_2_tok.tolist()]
+
+    question1_csc = gensim.matutils.corpus2csc(question1_vec, num_terms=len(dictionary.token2id))
+    question2_csc = gensim.matutils.corpus2csc(question2_vec, num_terms=len(dictionary.token2id))
+
+    return question1_csc.transpose(),question2_csc.transpose()
+
+
+q1_csc, q2_csc = get_vectors(df_train, dictionary)
