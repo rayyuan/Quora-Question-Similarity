@@ -235,3 +235,7 @@ def get_vectors(df, dictionary):
 
 
 q1_csc, q2_csc = get_vectors(df_train, dictionary)
+
+df_test = tokenize_questions(test)
+dictionary = train_dictionary(df_test)
+q1_csc, q2_csc = get_vectors(df_test, dictionary)
