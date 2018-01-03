@@ -208,3 +208,12 @@ def tokenize_questions(df):
     df["Question_2_tok"] = question_2_tokenized
 
     return df
+def train_dictionary(df):
+
+    questions_tokenized = df.Question_1_tok.tolist() + df.Question_2_tok.tolist()
+
+    dictionary = corpora.Dictionary(questions_tokenized)
+    dictionary.filter_extremes(no_below=5, no_above=0.5, keep_n=10000000)
+    dictionary.compactify()
+
+    return dictionary
