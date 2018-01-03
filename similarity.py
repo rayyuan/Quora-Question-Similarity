@@ -239,3 +239,15 @@ q1_csc, q2_csc = get_vectors(df_train, dictionary)
 df_test = tokenize_questions(test)
 dictionary = train_dictionary(df_test)
 q1_csc, q2_csc = get_vectors(df_test, dictionary)
+
+from sklearn.metrics.pairwise import cosine_similarity as cs
+
+def get_cosine_similarity(q1_csc, q2_csc):
+    cosine_sim = []
+    for i,j in zip(q1_csc, q2_csc):
+        sim = cs(i,j)
+        cosine_sim.append(sim[0][0])
+
+    return cosine_sim
+
+cosine_sim = get_cosine_similarity(q1_csc, q2_csc)
