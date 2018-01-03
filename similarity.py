@@ -184,3 +184,27 @@ def eda(df):
     question_appearing_more_than_once = [i for i in question_ids_counter.values() if i > 1]
     print ("Count of Quesitons appearing more than once = %s" %(len(question_appearing_more_than_once)))
 eda(test)
+
+
+import re
+import gensim
+from gensim import corpora
+from nltk.corpus import stopwords
+
+words = re.compile(r"\w+",re.I)
+stopword = stopwords.words('english')
+
+def tokenize_questions(df):
+    question_1_tokenized = []
+    question_2_tokenized = []
+
+    for q in df.question1.tolist():
+        question_1_tokenized.append([i.lower() for i in words.findall(q) if i not in stopword])
+
+    for q in df.question2.tolist():
+        question_2_tokenized.append([i.lower() for i in words.findall(q) if i not in stopword])
+
+    df["Question_1_tok"] = question_1_tokenized
+    df["Question_2_tok"] = question_2_tokenized
+
+    return df
