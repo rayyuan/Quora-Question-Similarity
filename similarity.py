@@ -208,6 +208,7 @@ def tokenize_questions(df):
     df["Question_2_tok"] = question_2_tokenized
 
     return df
+    
 def train_dictionary(df):
 
     questions_tokenized = df.Question_1_tok.tolist() + df.Question_2_tok.tolist()
@@ -217,3 +218,7 @@ def train_dictionary(df):
     dictionary.compactify()
 
     return dictionary
+
+df_train = tokenize_questions(train)
+dictionary = train_dictionary(df_train)
+print ("No of words in the dictionary = %s" %len(dictionary.token2id))
