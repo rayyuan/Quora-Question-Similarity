@@ -155,3 +155,23 @@ def tsne_plot(model):
     plt.show()
 
 tsne_plot(model)
+
+from collections import Counter
+import matplotlib.pyplot as plt
+import operator
+
+def eda(df):
+    print ("Duplicate Count = %s , Non Duplicate Count = %s"
+           %(df.is_duplicate.value_counts()[1],df.is_duplicate.value_counts()[0]))
+
+    question_ids_combined = df.qid1.tolist() + df.qid2.tolist()
+
+    print ("Unique Questions = %s" %(len(np.unique(question_ids_combined))))
+
+    question_ids_counter = Counter(question_ids_combined)
+    sorted_question_ids_counter = sorted(question_ids_counter.items(), key=operator.itemgetter(1))
+    question_appearing_more_than_once = [i for i in question_ids_counter.values() if i > 1]
+    print ("Count of Quesitons appearing more than once = %s" %(len(question_appearing_more_than_once)))
+
+
+eda(train)
